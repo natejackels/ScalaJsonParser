@@ -1,5 +1,3 @@
-package parse
-
 import scala.actors.Actor._
 import java.util.ArrayList
 import java.util.HashMap
@@ -21,28 +19,31 @@ object jsonParser {
     val input = remove_whitespace(in)
     val i0 = input(0)
     if(i0 == '{'){ // DONE
-      val(result, index) = loads_dict(input)
+      var(result, index) = loads_dict(input.substring(1))
+      index+=1
+      if(index > in.length){ index = in.length }
       if(remove_whitespace(in.substring(index)).length() != 0){ throw new Exception("Parse-Exception: Extra Data")}
       return result
     } else if (i0 == '['){ // DONE
-      var(result:Array[Object], index) = loads_list(input)
+      var(result:Array[Object], index) = loads_list(input.substring(1))
+      index+=1
       if(index > in.length){ index = in.length }
-      if(remove_whitespace(in.substring(index)).length() != 0){ throw new Exception("Parse-Exception: Extra Data")}
+      if(remove_whitespace(in.substring(index)).length() != 0){ throw new Exception("Parse-Exception: Extra Data:" + input.substring(index))}
       return result
     } else if (i0 == '"'){ // TODO XXX
       val endOfString = input.indexOf("\"", 1)
     } else if (i0 == 'n'){ // DONE
-      if(input.substring(0, 3).equals("null")){
+      if(input.substring(0, 4).equals("null")){
         if(remove_whitespace(input.substring(4)).length() != 0){ throw new Exception("Parse-Exception: Extra Data") }
         return null
       }
     } else if (i0 == 't'){ // DONE
-      if (input.substring(0, 3).equals("true")){
+      if (input.substring(0, 4).equals("true")){
         if(remove_whitespace(input.substring(4)).length() != 0){ throw new Exception("Parse-Exception: Extra Data")}
         return true
       }
     } else if (i0 == 'f'){ // DONE
-      if (input.substring(0, 4).equals("false")){
+      if (input.substring(0, 5).equals("false")){
         if (remove_whitespace(input.substring(5)).length() != 0){ throw new Exception("Parse-Exception: Extra Data")}
         return false
       }
@@ -57,7 +58,6 @@ object jsonParser {
 
   def loads_dict(input:String):(HashMap[String,Any],Integer) = { // TODO XXX
     var index = 0
-    if(input(0) == '{'){ index = 1}
     var result = new HashMap[String, Any]
     // While loop here
     var loop = true
@@ -95,17 +95,19 @@ object jsonParser {
           result.put(k, v)
         } else if (input(index) == '{'){
           // dict
+          index+=1
           var (v:HashMap[String,Any], i) = loads_dict(input.substring(index))
-          index += (i+1)
+          index += (i)
           result.put(k, v)
         } else if (input(index) == '['){
           // list
+          index+=1
           var (v:Array[Object], i) = loads_list(input.substring(index))
-          index += (i+1)
+          index += (i)
           result.put(k, v)
         } else if (input(index) == 't'){
           // true?
-          if(input.substring(index, index+3).equals("true")){
+          if(input.substring(index, index+4).equals("true")){
             index += 4
             result.put(k, true)
           } else {
@@ -113,7 +115,7 @@ object jsonParser {
           }
         } else if (input(index) == 'f'){
           // false?
-          if(input.substring(index,index+4).equals("false")){
+          if(input.substring(index,index+5).equals("false")){
             index+=5
             result.put(k, false)
           } else {
@@ -121,7 +123,7 @@ object jsonParser {
           }
         } else if (input(index) == 'n'){
           // null?
-          if(input.substring(index, index+3).equals("null")){
+          if(input.substring(index, index+4).equals("null")){
             index+=4
             v = null
           } else {
@@ -164,6 +166,13 @@ object jsonParser {
       }      
     }
     if(input(index) == '}'){
+      while((index < input.length) &&
+         ((input.charAt(index) == ' ' ) ||
+          (input.charAt(index) == '\t') || 
+          (input.charAt(index) == '\n') ||
+          (input.charAt(index) == '\r'))){
+        index=index+1
+      }
       return (result,index+1)
     }
     throw new Exception("Parser-Exception: Dict missing terminating bracket")
@@ -172,7 +181,6 @@ object jsonParser {
   def loads_list(input:String):(Array[Object],Integer) = {
     var result = new ArrayList[Any]
     var index = 0
-    if(input(0) == '['){index=1}
     var next = input(index)
     var loop = true
     var nextIsComma = false
@@ -204,15 +212,17 @@ object jsonParser {
         nextIsComma = true
       } else if (next == '{'){
         //dict within a list
+        index+=1
         var(x:Object,y:Integer) = loads_dict(input.substring(index))
         result.add(x)
         index += y
         nextIsComma = true
       } else if (next == '['){
         //list within a list
-        val(x:Array[Object], y:Integer) = loads_list(input.substring(index))
+        index+=1
+        val(x:Array[Object], y:Integer) = loads_list(input.substring(index+1))
         result.add(x)
-        index+=y
+        index+=y+1
         nextIsComma = true
       } else if ("1234567890.-".contains(next)){
         // number
@@ -250,7 +260,7 @@ object jsonParser {
         next = input(index)
       }
     }
-    if(index > input.length){
+    if(index > input.length-1){
       if(input(index-1) != ']'){ throw new Exception("Parse-Exception: Open ended list")}
     } else {
       if(input(index) != ']'){ throw new Exception("Parse-Exception: Open ended list")}
