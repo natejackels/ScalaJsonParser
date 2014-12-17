@@ -4,7 +4,7 @@ import java.util.HashMap
 import java.util.Scanner
 
 object jsonGenerator {
-	def dumps(in:Array[Any]):String = {
+	def dumps_array(in:Array[Any]):String = {
 	  var finalVal = new Array[String](in.length)
 	  var continue = true
 	  var count = 0
@@ -25,15 +25,15 @@ object jsonGenerator {
 	  val i = 0
 	  in.foreach { // actor calls
 	    case x:Array[Any]=>
-	      listActor ! (in.indexOf(x), dumps(x))
+	      listActor ! (in.indexOf(x), dumps_array(x))
 	    case x:HashMap[Any,Any]=>
-	      listActor ! (in.indexOf(x), dumps(x))
+	      listActor ! (in.indexOf(x), dumps_map(x))
 	    case x:Number=>
-	      listActor ! (in.indexOf(x), dumps(x))
+	      listActor ! (in.indexOf(x), dumps_number(x))
 	    case x:String=>
 	      listActor ! (in.indexOf(x), "\"" + x + "\"")
 	    case x:jsonable=>
-	      listActor ! (in.indexOf(x), dumps(x))
+	      listActor ! (in.indexOf(x), dumps_json(x))
 	    case x: Any =>
 	      if(x == false){
 	        listActor ! (in.indexOf(x), "false")
@@ -59,7 +59,7 @@ object jsonGenerator {
 	}
 
 
-	def dumps(in:HashMap[Any,Any]):String = {
+	def dumps_map(in:HashMap[Any,Any]):String = {
 	  if(in.size() == 0){
 	    return "{}"
 	  }
@@ -100,9 +100,9 @@ object jsonGenerator {
 	    case x:String =>
 	      keyActor ! (kset.indexOf(x), x)
 	    case x:jsonable =>
-	      keyActor ! (kset.indexOf(x), dumps(x))
+	      keyActor ! (kset.indexOf(x), dumps_json(x))
 	    case x:Number =>
-	      keyActor ! (kset.indexOf(x), dumps(x))
+	      keyActor ! (kset.indexOf(x), dumps_number(x))
 	    case x:Any =>
 	      if(x == false){
 	        keyActor ! (kset.indexOf(x), "false")
@@ -118,17 +118,15 @@ object jsonGenerator {
 	  val vset = in.values().toArray()
 	  vset.foreach{
 	    case x:Array[Any]=>
-	      valActor ! (vset.indexOf(x), dumps(x))
-	    case x:HashMap[Any,Any]=>{
-	      val xresult = dumps(x)
-	      valActor ! (vset.indexOf(x), xresult)
-	      }
+	      valActor ! (vset.indexOf(x), dumps_array(x))
+	    case x:HashMap[Any,Any]=>
+	      valActor ! (vset.indexOf(x), dumps_map(x))
 	    case x:Number=>
-	      valActor ! (vset.indexOf(x), dumps(x))
+	      valActor ! (vset.indexOf(x), dumps_number(x))
 	    case x:String=>
 	      valActor ! (vset.indexOf(x), "\"" + x + "\"")
 	    case x:jsonable=>
-	      valActor ! (vset.indexOf(x), x.jsonify())
+	      valActor ! (vset.indexOf(x), dumps_json(x))
 	    case x: Any =>
 	      if(x == false){
 	        valActor ! (vset.indexOf(x), "\"false\"")
@@ -174,6 +172,14 @@ object jsonGenerator {
 	    return "true"
 	  } else if (in == null){
 	    return "null"
+	  } else if(in.isInstance(jsonable)){
+	  	return dumps_json(in)
+	  } else if(in.isInstance(Array[Any])){
+	  	return dumps_array(in)
+	  } else if(in.isInstance(HashMap[Any,Any])){
+	  	return dumps_map(in)
+	  } else if(in.isInstance(Number)){
+	  	return dumps_number(in)
 	  } else {
 		throw new Exception("Type not accepted")
 	  }
