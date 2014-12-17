@@ -8,6 +8,7 @@ object performance {
 		var runTime : Double = 0
 		var totalTime: Double = 0
 		var result2 = ""
+
 		var result = jsonParser.loads("""{"id": 1,"name": "A green door","price": 12.50,"tags": ["home", "green"] }""")
 		println(result)
 		for (a <- 1 to 25){
@@ -19,7 +20,7 @@ object performance {
 				totalTime += runTime
 			}
 		}
-		println(totalTime/25 + " Seconds for tests")
+		println(totalTime/23 + " Seconds for tests")
 		println(result2)
   	}
 }
