@@ -5,6 +5,7 @@ import java.util.Scanner
 
 object jsonGenerator {
 	def dumps_array(in:Array[Any]):String = {
+	  //println("in dumps")
 	  var finalVal = new Array[String](in.length)
 	  var continue = true
 	  var count = 0
@@ -16,12 +17,13 @@ object jsonGenerator {
 		        finalVal(x) = y
 		        count += 1
 		        if(count == in.length){
+		          //println("last actor")
 		          continue = false
 		        }
 		    }
 		  }
 	  }
-	  
+	  //println("out of actor")
 	  val i = 0
 	  in.foreach { // actor calls
 	    case x:Array[Any]=>
@@ -46,8 +48,9 @@ object jsonGenerator {
 	    	throw new Exception("Class not accepted")
 	      }
 	  }
-
-	  while(continue){} // wait for actor to finish
+	  //println("out of in for each")
+	  while(continue){for(xyz<-0 to 1){}} // wait for actor to finish
+	  //println("Passsed continue")
 	  var result = "["
 	  finalVal.foreach { // turn into a string
 	    case x=>
@@ -58,7 +61,7 @@ object jsonGenerator {
 	  return result
 	}
 
-
+	
 	def dumps_map(in:HashMap[Any,Any]):String = {
 	  if(in.size() == 0){
 	    return "{}"
@@ -139,7 +142,7 @@ object jsonGenerator {
 	    	throw new Exception("Class not accepted")
 	      }
 	  }
-	  while((Keys==true) || (Values==true)){}
+	  while((Keys==true) || (Values==true)){for(xyz<-0 to 1){}}
 	  var result = "{"
 	  var i = 0
 	  while(i < in.size()){
