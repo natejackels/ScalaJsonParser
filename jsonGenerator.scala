@@ -117,7 +117,7 @@ object jsonGenerator {
 	      Values = false
 	      throw new Exception("Class not accepted")
 	  }
-	  while((Keys==true) && (Values==true)){}
+	  while((Keys==true) || (Values==true)){}
 	  var result = "{"
 	  var i = 0
 	  while(i < in.size()){
