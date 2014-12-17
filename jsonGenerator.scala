@@ -4,7 +4,7 @@ import java.util.HashMap
 import java.util.Scanner
 
 object jsonGenerator {
-	def loads(in:Array[Any]):String = {
+	def dumps(in:Array[Any]):String = {
 	  var finalVal = new Array[String](in.length)
 	  var continue = true
 	  var count = 0
@@ -25,15 +25,15 @@ object jsonGenerator {
 	  val i = 0
 	  in.foreach { // actor calls
 	    case x:Array[Any]=>
-	      listActor ! (in.indexOf(x), loads(x))
+	      listActor ! (in.indexOf(x), dumps(x))
 	    case x:HashMap[Any,Any]=>
-	      listActor ! (in.indexOf(x), loads(x))
+	      listActor ! (in.indexOf(x), dumps(x))
 	    case x:Number=>
-	      listActor ! (in.indexOf(x), loads(x))
+	      listActor ! (in.indexOf(x), dumps(x))
 	    case x:String=>
 	      listActor ! (in.indexOf(x), "\"" + x + "\"")
 	    case x:jsonable=>
-	      listActor ! (in.indexOf(x), loads(x))
+	      listActor ! (in.indexOf(x), dumps(x))
 	    case x: Any =>
 	      continue = false
 	      throw new Exception("Class not accepted")
@@ -51,7 +51,7 @@ object jsonGenerator {
 	}
 
 
-	def loads(in:HashMap[Any,Any]):String = {
+	def dumps(in:HashMap[Any,Any]):String = {
 	  if(in.size() == 0){
 	    return "{}"
 	  }
@@ -92,9 +92,9 @@ object jsonGenerator {
 	    case x:String =>
 	      keyActor ! (kset.indexOf(x), x)
 	    case x:jsonable =>
-	      keyActor ! (kset.indexOf(x), loads(x))
+	      keyActor ! (kset.indexOf(x), dumps(x))
 	    case x:Number =>
-	      keyActor ! (kset.indexOf(x), loads(x))
+	      keyActor ! (kset.indexOf(x), dumps(x))
 	    case x:Any =>
 	      Keys = false
 	      throw new Exception("Must have a string type for Dictionary Key")
@@ -102,13 +102,13 @@ object jsonGenerator {
 	  val vset = in.values().toArray()
 	  vset.foreach{
 	    case x:Array[Any]=>
-	      valActor ! (vset.indexOf(x), loads(x))
+	      valActor ! (vset.indexOf(x), dumps(x))
 	    case x:HashMap[Any,Any]=>{
-	      val xresult = loads(x)
+	      val xresult = dumps(x)
 	      valActor ! (vset.indexOf(x), xresult)
 	      }
 	    case x:Number=>
-	      valActor ! (vset.indexOf(x), loads(x))
+	      valActor ! (vset.indexOf(x), dumps(x))
 	    case x:String=>
 	      valActor ! (vset.indexOf(x), "\"" + x + "\"")
 	    case x:jsonable=>
@@ -135,12 +135,12 @@ object jsonGenerator {
 	}
 
 
-	def loads(in:Number):String = { // DONE
+	def dumps(in:Number):String = { // DONE
 	  return in.toString()
 	}
 
 
-	def loads(in:jsonable):String = { // DONE
+	def dumps(in:jsonable):String = { // DONE
 	  return in.jsonify
 	}
 }
