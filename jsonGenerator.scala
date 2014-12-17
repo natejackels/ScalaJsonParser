@@ -36,7 +36,7 @@ object jsonGenerator {
 	      listActor ! (in.indexOf(x), "\"" + x + "\"")
 	    case x:jsonable=>
 	      listActor ! (in.indexOf(x), dumps_json(x))
-	    case x: Any =>
+	    case x =>
 	      if(x == false){
 	        listActor ! (in.indexOf(x), "false")
 	      } else if (x == true){
@@ -106,7 +106,7 @@ object jsonGenerator {
 	      keyActor ! (kset.indexOf(x), dumps_json(x))
 	    case x:Number =>
 	      keyActor ! (kset.indexOf(x), dumps_number(x))
-	    case x:Any =>
+	    case x =>
 	      if(x == false){
 	        keyActor ! (kset.indexOf(x), "false")
 	      } else if (x == true){
@@ -130,7 +130,7 @@ object jsonGenerator {
 	      valActor ! (vset.indexOf(x), "\"" + x + "\"")
 	    case x:jsonable=>
 	      valActor ! (vset.indexOf(x), dumps_json(x))
-	    case x: Any =>
+	    case x =>
 	      if(x == false){
 	        valActor ! (vset.indexOf(x), "\"false\"")
 	      } else if (x == true){
