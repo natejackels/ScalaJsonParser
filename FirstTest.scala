@@ -10,7 +10,7 @@ import java.util.Arrays
 
 
 //Commands to Compile and Run:
-//Compile: scalac -cp scalatest_2.11-2.2.1.jar jsonParser.scala FirstTest.scala
+//Compile: scalac -cp scalatest_2.11-2.2.1.jar jsonParser.scala jsonGenerator.scala  jsonable.scala FirstTest.scala
 //Run: scala -cp scalatest_2.11-2.2.1.jar org.scalatest.run FirstTest
 class FirstTest extends FunSuite with BeforeAndAfter{
 	var loadResults = jsonParser.loads("""{"id": 1,"name": "A green door","price": 12.50,"tags": ["home", "green"] }""").asInstanceOf[HashMap[String, Any]]
@@ -81,15 +81,39 @@ class FirstTest extends FunSuite with BeforeAndAfter{
 		assert(finalResults == removeWhitespaceResults)
 	}
 
+	//***************
+	//Generator Tests
+	//***************
+
+	var jsonDump = jsonGenerator.dumps(loadResults)
+	var actualJsonDump = """{"price":12.5, "name":"A green door", "id":1, "tags":["home", "green"]}"""
+	
+	test("dumps test from the jsonGenerator using a small test"){
+		assert(jsonDump.toString == actualJsonDump)
+	}
+
+	var genLoadResults = jsonParser.loads("""{"id": 1,"name": "A green door","price": 12.50,"tags": ["home", "green"] }""").asInstanceOf[HashMap[Any, Any]]
+	var jsonDumpMap = jsonGenerator.dumps_map(genLoadResults)
+
+	test("dumps_map test from jsonGenerator using a small test"){
+		assert(jsonDumpMap.toString == actualJsonDump)
+	}
+
+	var numTest = 5
+	var numResults = jsonGenerator.dumps_number(numTest)
+
+	test("dumps_number test from jsonGenerator using a small test"){
+		assert(numTest.toString == numResults.toString)
+	}
 
 
+	var genLoadListResults = jsonParser.loads_list(""""home", "green"] }""").asInstanceOf[Tuple2[Array[Object], Integer]].productElement(0).asInstanceOf[Array[Any]]
+	var arrayResults = jsonGenerator.dumps_array(genLoadListResults)
+	var actualArray = """["home", "green"]"""
 
-
-
-
-
-
-
+	test("dumps_array test from jsonGenerator using a small test"){
+		assert(actualArray.toString == arrayResults.toString)
+	}
 
 
 
