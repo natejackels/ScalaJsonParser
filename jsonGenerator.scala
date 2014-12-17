@@ -157,12 +157,12 @@ object jsonGenerator {
 	}
 
 
-	def dumps(in:Number):String = { // DONE
+	def dumps_number(in:Number):String = { // DONE
 	  return in.toString()
 	}
 
 
-	def dumps(in:jsonable):String = { // DONE
+	def dumps_json(in:jsonable):String = { // DONE
 	  return in.jsonify
 	}
 	def dumps(in:Any):String = {
@@ -172,14 +172,14 @@ object jsonGenerator {
 	    return "true"
 	  } else if (in == null){
 	    return "null"
-	  } else if(in.isInstance(jsonable)){
-	  	return dumps_json(in)
-	  } else if(in.isInstance(Array[Any])){
-	  	return dumps_array(in)
-	  } else if(in.isInstance(HashMap[Any,Any])){
-	  	return dumps_map(in)
-	  } else if(in.isInstance(Number)){
-	  	return dumps_number(in)
+	  } else if( in.isInstanceOf[jsonable] ){
+	  	return dumps_json(in.asInstanceOf[jsonable])
+	  } else if(in.isInstanceOf[Array[Any]]){
+	  	return dumps_array(in.asInstanceOf[Array[Any]])
+	  } else if(in.isInstanceOf[HashMap[Any,Any]]){
+	  	return dumps_map(in.asInstanceOf[HashMap[Any, Any]])
+	  } else if(in.isInstanceOf[Number]){
+	  	return dumps_number(in.asInstanceOf[Number])
 	  } else {
 		throw new Exception("Type not accepted")
 	  }
