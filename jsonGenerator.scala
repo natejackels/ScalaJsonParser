@@ -35,8 +35,16 @@ object jsonGenerator {
 	    case x:jsonable=>
 	      listActor ! (in.indexOf(x), dumps(x))
 	    case x: Any =>
-	      continue = false
-	      throw new Exception("Class not accepted")
+	      if(x == false){
+	        listActor ! (in.indexOf(x), "false")
+	      } else if (x == true){
+	        listActor ! (in.indexOf(x), "true")
+	      } else if (x == null){
+	        listActor ! (in.indexOf(x), "null")
+	      } else {
+	    	continue= false
+	    	throw new Exception("Class not accepted")
+	      }
 	  }
 
 	  while(continue){} // wait for actor to finish
@@ -96,8 +104,16 @@ object jsonGenerator {
 	    case x:Number =>
 	      keyActor ! (kset.indexOf(x), dumps(x))
 	    case x:Any =>
-	      Keys = false
-	      throw new Exception("Must have a string type for Dictionary Key")
+	      if(x == false){
+	        keyActor ! (kset.indexOf(x), "false")
+	      } else if (x == true){
+	        keyActor ! (kset.indexOf(x), "true")
+	      } else if (x == null){
+	        keyActor ! (kset.indexOf(x), "null")
+	      } else {
+	    	Keys = false
+	    	throw new Exception("Must have a string type for Dictionary Key")
+	      }
 	  }
 	  val vset = in.values().toArray()
 	  vset.foreach{
@@ -114,8 +130,16 @@ object jsonGenerator {
 	    case x:jsonable=>
 	      valActor ! (vset.indexOf(x), x.jsonify())
 	    case x: Any =>
-	      Values = false
-	      throw new Exception("Class not accepted")
+	      if(x == false){
+	        valActor ! (vset.indexOf(x), "\"false\"")
+	      } else if (x == true){
+	        valActor ! (vset.indexOf(x), "\"true\"")
+	      } else if (x == null){
+	        valActor ! (vset.indexOf(x), "\"null\"")
+	      } else {
+	    	Values = false
+	    	throw new Exception("Class not accepted")
+	      }
 	  }
 	  while((Keys==true) || (Values==true)){}
 	  var result = "{"
@@ -142,5 +166,16 @@ object jsonGenerator {
 
 	def dumps(in:jsonable):String = { // DONE
 	  return in.jsonify
+	}
+	def dumps(in:Any):String = {
+	  if(in == false){
+	    return "false"
+	  } else if (in == true){
+	    return "true"
+	  } else if (in == null){
+	    return "null"
+	  } else {
+		throw new Exception("Type not accepted")
+	  }
 	}
 }
