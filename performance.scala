@@ -9,8 +9,11 @@ object performance {
 		var totalTime: Double = 0
 		var result2 = ""
 
+		// parses JSON in string form
 		var result = jsonParser.loads("""{"id": 1,"name": "A green door","price": 12.50,"tags": ["home", "green"] }""")
 		println(result)
+
+		// run a amount of times for performance testing, in this case testing the generator
 		for (a <- 1 to 25){
 			startTime = java.lang.System.currentTimeMillis()
 			result2 = jsonGenerator.dumps(result)
