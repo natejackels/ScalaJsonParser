@@ -12,5 +12,5 @@ TESTING CURRENT IMP:
 	 
 Running the Tests:
 
-	Compile: scalac -cp scalatest_2.11-2.2.1.jar jsonParser.scala FirstTest.scala
+	Compile: scalac -cp scalatest_2.11-2.2.1.jar jsonParser.scala jsonGenerator.scala  jsonable.scala FirstTest.scala
 	Run: scala -cp scalatest_2.11-2.2.1.jar org.scalatest.run FirstTest
